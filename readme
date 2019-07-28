@@ -1,0 +1,15 @@
+Hello,
+
+Welcome to CLI based test task of a simple shopping cart.
+
+To run this project you first need to install the dependecies from requirement.txt file.
+
+To install requirement use:
+
+pip install -r requirement.txt
+
+This command will install the necessary dependecies for you.
+
+Now to run the project you just need to run:
+
+python main.py

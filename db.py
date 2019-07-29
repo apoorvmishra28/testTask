@@ -232,14 +232,18 @@ class DB:
         except mysql.connector.Error as e:
             print("Error: {}".format(e))
 
-    # def seed_dummy_items(self):
-    #     try:
-    #         mycursor.execute(
-    #             "INSERT INTO items (role, user_id) VALUES ('{}', {})".
-    #                 format(('admin', 1), ('user', 2), ('user', 3))
-    #         )
-    #     except mysql.connector.Error as e:
-    #         print("Error: {}".format(e))
+    def seed_dummy_items(self):
+        try:
+            mycursor.execute(
+                "INSERT INTO items (item_name, price, user_id) VALUES ('{}', {}, {})".
+                    format(('Adidas', 2795.00, 1), ('Fossil', 9780.95, 1), ('Oneplus 7', 42000.00, 1))
+            )
+        except mysql.connector.Error as e:
+            print("Error: {}".format(e))
+            
+    def close_connection(self):
+        mycursor.close()
+        mydb.close()
 
 db = DB()
 db.create_users()
@@ -249,4 +253,4 @@ db.create_cart()
 db.create_order_table()
 db.seed_dummy_users()
 db.seed_dummy_roles()
-# db.seed_dummy_items()
+db.seed_dummy_items()

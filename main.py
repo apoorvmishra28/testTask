@@ -1,4 +1,5 @@
 from .db import DB
+import sys
 
 def get_admins_option():
     print("Welcome {}".format(user[1]))
@@ -88,3 +89,7 @@ if __name__ == "__main__":
                 print("ID \t Items \t Date \t Amount")
                 for x in orders:
                     print(x[0], "\t", x[1], "\t", x[3], "\t", x[2])
+        char = input("5) Press 'q' to quit. ")
+        if char == "q":
+            db.close_connection()
+            sys.exit(0)

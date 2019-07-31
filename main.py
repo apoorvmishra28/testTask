@@ -1,4 +1,4 @@
-from .db import DB
+import db
 import sys
 
 def get_admins_option():
@@ -30,7 +30,7 @@ def get_users_name(db, user_id):
     return usersname
 
 if __name__ == "__main__":
-    db = DB()
+    db = db.DB()
     print("****************Welcome to the Task Shop****************")
     print("Please login before continue.")
     username = input("Enter username: ")

@@ -248,6 +248,9 @@ class DB:
             mycursor.commit()
         except mysql.connector.Error as e:
             print("Error: {}".format(e))
+    def close_connection(self):
+        mycursor.close()
+        mydb.close()
 
 db = DB()
 db.create_users()

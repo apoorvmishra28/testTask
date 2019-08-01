@@ -13,3 +13,6 @@ This command will install the necessary dependecies for you.
 Now to run the project you just need to run:
 
 python main.py
+
+Please login as admin using username: admin and password: admin
+Please login as user(customer) using username: test1 and password: 123456

@@ -8,6 +8,7 @@ def get_admins_option():
     print("2) Add products.")
     print("3) Delete products.")
     print("4) List order report.")
+    print("5) Press 5 to quit. ")
     choice = int(input("Enter choice: "))
     return choice
 
@@ -18,6 +19,7 @@ def get_users_option():
     print("2) Buy product.")
     print("3) Book order.")
     print("4) Get Order History.")
+    print("5) Press 5 to quit. ")
     choice = int(input("Enter choice: "))
     return choice
 
@@ -36,9 +38,9 @@ if __name__ == "__main__":
     username = input("Enter username: ")
     password = input("Enter password: ")
     user = db.get_user(username, password)
-    user_role = db.get_role(user)
+    user_role = db.get_role(user[0])
     while True:
-        if user_role[1] == "admin":
+        if user_role[0] == "admin":
             choice = get_admins_option()
             if choice == 1:
                 items = db.get_items()
@@ -46,7 +48,7 @@ if __name__ == "__main__":
                     print("Item Name: {} \t Item Price: {}".format(x[1], x[2]))
             if choice == 2:
                 item_name = input("Enter product name: ")
-                price = float(input("Enter price: "))
+                price = int(input("Enter price: "))
                 add_product = db.insert_item(item_name, price, user[0])
                 if add_product:
                     print("Product added successfully")
@@ -63,6 +65,10 @@ if __name__ == "__main__":
                     item_name = get_item_name(db, x[1])
                     usersname = get_users_name(db, x[3])
                     print(x[0], "\t", item_name, "\t", usersname, "\t", x[4])
+            if choice == 5:
+	            db.close_connection()
+	            sys.exit(0)
+
 
         else:
             choice = get_users_option()
@@ -72,8 +78,8 @@ if __name__ == "__main__":
                     print("ID: {} \t Item Name: {} \t Item Price: {}".format(x[0], x[1], x[2]))
             if choice == 2:
                 print("***** Add products to cart *****")
-                items = [int(x) for x in input("Enter item ID to add it to cart: ").split()]
-                add_to_cart = db.add_to_cart(items, user[0])
+                items = [tuple((x, user[0])) for x in input("Enter item ID to add it to cart: ").split()]
+                add_to_cart = db.add_to_cart(items)
                 if add_to_cart:
                     print("Products added successfully")
             if choice == 3:
@@ -89,7 +95,7 @@ if __name__ == "__main__":
                 print("ID \t Items \t Date \t Amount")
                 for x in orders:
                     print(x[0], "\t", x[1], "\t", x[3], "\t", x[2])
-        char = input("5) Press 'q' to quit. ")
-        if char == "q":
-            db.close_connection()
-            sys.exit(0)
+            if choice == 5:
+	            db.close_connection()
+	            sys.exit(0)
+        

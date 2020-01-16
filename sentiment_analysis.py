@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 15 12:31:58 2020
-
-@author: cis
-"""
-
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
@@ -16,69 +8,60 @@ from collections import Counter
 import tensorflow as tf
 
 lemma = WordNetLemmatizer()
-no_of_lines=10000000
+no_of_lines=2000000
 
 import pandas as pd
 
-data = pd.read_csv("/home/cis/sentiment_train.csv", index_col='id')
 
-convert_dict = {'sentiment': int, 
-                'text': str
-               }
-data = data.astype(convert_dict)
-#data_new = data[data["text"] == str]
+lexicon = []
+l2=[]
+featureset= []
+features = []
 
-pos_data = data[data["sentiment"] == 1]
-neg_data = data[data["sentiment"] == 0]
-
-
-pos = ""
-neg = ""
-
-for row in pos_data.itertuples(index = True, name ='Pandas'): 
-    pos +=  getattr(row, "text")
-    pos += "\n"
+def create_lexicon(pos,neg, lexicon, l2):
     
-for row in neg_data.itertuples(index = True, name ='Pandas'): 
-    neg +=  getattr(row, "text")
-    neg += "\n"
-
-def create_lexicon(pos,neg):
-    lexicon = []
     for fi in [pos,neg]:
         contents = fi.split("\n")
-        for l in contents[:no_of_lines]:
+        for l in contents:
             all_words = word_tokenize(l.lower())
             lexicon += list(all_words)
     lexicon = [lemma.lemmatize(i) for i in lexicon]
     w_counts = Counter(lexicon)
-    l2=[]
     for w in w_counts:
         if 1000>w_counts[w]> 50:
             l2.append(w)
-    print(len(l2))
+    print(len(l2),"---->","Create_lexicon Completed")
     return l2
 
-def sample_handling(sample,lexicon,classification):
-    featureset= []
+def sample_handling(sample,lexicon,classification, featureset):
+    #print("1")
     contents = sample.split("\n")
-    for l in contents[:no_of_lines]:
+#    print("2")
+#    import pdb; pdb.set_trace()
+    for l in contents:
         current_words = word_tokenize(l.lower())
+#        print("3")
         current_words = [lemma.lemmatize(i) for i in current_words]
+#        print("4")
         features = np.zeros(len(lexicon))
+#        print("5")
         for word in current_words:
             if word.lower() in lexicon:
                 index_value = lexicon.index(word.lower())
+#                print("6")
                 features[index_value] += 1
+#                print("7")
             features = list(features)
+#            print("8")
             featureset.append([features, classification])
+#            print("9")
+    print("sample_handling Completed")
     return featureset
 
-def create_featuresets_and_labels(pos,neg,test_size=0.1):
-    lexicon = create_lexicon(pos,neg)
-    features = []
-    features += sample_handling(pos, lexicon,[1,0])
-    features += sample_handling(neg, lexicon,[0,1])
+def create_featuresets_and_labels(pos,neg, features, lexicon, l2, test_size=0.1):
+    lexicon = create_lexicon(pos,neg, lexicon, l2)
+    features += sample_handling(pos, lexicon,[1,0], featureset)
+    features += sample_handling(neg, lexicon,[0,1], featureset)
     random.shuffle(features)
     
     features = np.array(features)
@@ -90,10 +73,36 @@ def create_featuresets_and_labels(pos,neg,test_size=0.1):
     
     test_x = list(features[:,0][-testing_size:])
     test_y = list(features[:,1][-testing_size:])
-    
+    print("create_feature Completed")
     return train_x,train_y,test_x,test_y
 
-train_x,train_y,test_x,test_y = create_featuresets_and_labels(pos, neg)
+
+for data in pd.read_csv("/home/cis/Desktop/desktop/sentiment_data/sentiment_train.csv", index_col='id', chunksize=1000):
+#data = pd.read_csv("/home/cis/Desktop/desktop/sentiment_data/sentiment_train.csv", index_col='id')
+    
+    convert_dict = {'sentiment': int, 
+                    'text': str
+                   }
+    data = data.astype(convert_dict)
+    #data_new = data[data["text"] == str]
+    
+    pos_data = data[data["sentiment"] == 1]
+    neg_data = data[data["sentiment"] == 0]
+    
+    
+    pos = ""
+    neg = ""
+    
+    for row in pos_data.itertuples(index = True, name ='Pandas'): 
+        pos +=  getattr(row, "text")
+        pos += "\n"
+        
+    for row in neg_data.itertuples(index = True, name ='Pandas'): 
+        neg +=  getattr(row, "text")
+        neg += "\n"
+
+
+    train_x,train_y,test_x,test_y = create_featuresets_and_labels(pos, neg,features, lexicon, l2)
 
 n_nodes_hl1 = 500
 n_nodes_hl2 = 500
@@ -162,6 +171,6 @@ def train_nn(x):
 train_nn_1 = train_nn(x)
 
 ## Predictions
-
-pred_data = pd.read_csv("/home/cis/Downloads/sentiment_test_x.csv")
-del(pred_data)
+#
+# pred_data = pd.read_csv("/home/cis/Downloads/sentiment_test_x.csv")
+# del(pred_data)
